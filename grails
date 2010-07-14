@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Check if GRAILS_HOME is set
+if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]
+then
+	echo "Error: GRAILS_HOME not set"
+	exit 2
+fi
+
+# Extract the default version and base path from GRAILS_HOME
+DEFAULT_VERSION=`basename $GRAILS_HOME | cut -f 2 -d "-"`
+BASE_GRAILS_PATH=`dirname $GRAILS_HOME`
+APP_PROP="application.properties"
+
+# Try to get the version from the command line
+TRY_VERSION=$1
+if [ -d "${BASE_GRAILS_PATH}/grails-${TRY_VERSION}" ]
+then
+	VERSION=$TRY_VERSION
+	shift
+fi 
+
+# Or else get the version from the application.properties in the current directory
+[ -z "$VERSION" -a -f "$APP_PROP" ] &&
+	VERSION=`grep app.grails.version $APP_PROP| cut -d "=" -f 2 | tr -d "\r"`
+
+# Or else use the default version
+[ -z "$VERSION" ] &&
+	VERSION=$DEFAULT_VERSION
+
+export GRAILS_HOME=${BASE_GRAILS_PATH}/grails-${VERSION}
+GRAILS_CMD=${GRAILS_HOME}/bin/grails
+
+if [ ! -x "$GRAILS_CMD" ]; then
+	echo "Error: grails command not found at '$GRAILS_CMD'!"
+	exit 3
+fi
+
+exec $GRAILS_CMD $*
