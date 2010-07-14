@@ -1,6 +1,6 @@
 # Prerequisites
 
-- All Grails versions must be installed under the same base directory. Ex:
+* All Grails versions must be installed under the same base directory. Ex:
 	
 	/opt/grails-1.0.3
 	/opt/grails-1.1.1
