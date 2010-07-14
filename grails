@@ -23,7 +23,8 @@ fi
 
 # Or else get the version from the application.properties in the current directory
 [ -z "$VERSION" -a -f "$APP_PROP" ] &&
-	VERSION=`grep app.grails.version $APP_PROP| cut -d "=" -f 2 | tr -d "\r"`
+    VERSION=`awk -F'=' '/app.grails.version/ { print $2 }' < $APP_PROP`
+#	VERSION=`grep app.grails.version $APP_PROP| cut -d "=" -f 2 | tr -d "\r"`
 
 # Or else use the default version
 [ -z "$VERSION" ] &&
