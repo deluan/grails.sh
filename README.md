@@ -1,11 +1,11 @@
 # Prerequisites
 
 * All Grails versions must be installed under the same base directory. Ex:
-	
+`	
     /opt/grails-1.0.3
     /opt/grails-1.1.1
     /opt/grails-1.3.2
-
+`
 * `GRAILS_HOME` environment variable pointing to your "default" Grails installation
 * This script was tested on Mac OS X (Snow Leopard), Linux (Ubuntu) and Windows (with cygwin)
 
