@@ -1,4 +1,5 @@
 #!/bin/sh
+# Author: Deluan (http://github.com/deluan)
 
 # Check if GRAILS_HOME is set
 if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]
