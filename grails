@@ -2,8 +2,7 @@
 # Author: Deluan (http://github.com/deluan)
 
 # Check if GRAILS_HOME is set
-if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]
-then
+if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]; then
 	echo "Error: GRAILS_HOME not set"
 	exit 2
 fi
@@ -15,8 +14,7 @@ APP_PROP="application.properties"
 
 # Try to get the version from the command line
 TRY_VERSION=$1
-if [ -d "${BASE_GRAILS_PATH}/grails-${TRY_VERSION}" ]
-then
+if [ -d "${BASE_GRAILS_PATH}/grails-${TRY_VERSION}" ]; then
 	VERSION=$TRY_VERSION
 	shift
 fi 
