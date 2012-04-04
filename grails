@@ -15,7 +15,7 @@ APP_PROP="application.properties"
 
 # Try to get the version from the command line
 TRY_VERSION=$1
-if [[ $TRY_VERSION =~ [1234567890]  ]]; then
+if [[ $TRY_VERSION =~ [0-9]\.[0-9]\.[0-9] ]]; then
 	VERSION=$TRY_VERSION
 	shift
 fi 
