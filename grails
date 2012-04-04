@@ -14,7 +14,7 @@ APP_PROP="application.properties"
 
 # Try to get the version from the command line
 TRY_VERSION=$1
-if [ -d "${BASE_GRAILS_PATH}/grails-${TRY_VERSION}" ]; then
+if [[ $TRY_VERSION =~ [1234567890]  ]]; then
 	VERSION=$TRY_VERSION
 	shift
 fi 
@@ -29,6 +29,7 @@ fi
 
 export GRAILS_HOME=${BASE_GRAILS_PATH}/grails-${VERSION}
 
+# Attempt to download and unzip the specified version if it does not exist
 if [ ! -d ${GRAILS_HOME} ]; then
         NEW_GRAILS_FILE=grails-${VERSION}
         echo "grails ${VERSION} does not exist, attempting to download..."
