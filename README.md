@@ -8,7 +8,8 @@ Prerequisites
         /opt/grails-1.3.2
 
 * `GRAILS_HOME` environment variable must be set and point to your "default" Grails installation
-* This script was tested on Mac OS X (Snow Leopard), Linux (Ubuntu) and Windows (with cygwin)
+* cURL and unzip (If you want it to automatically pull missing versions)
+* This script was tested on Mac OS X (Lion), Linux (Ubuntu) and Windows (with cygwin)
 
 Installation
 ------------
