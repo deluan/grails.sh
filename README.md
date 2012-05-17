@@ -8,7 +8,8 @@ Prerequisites
         /opt/grails-1.3.2
 
 * `GRAILS_HOME` environment variable must be set and point to your "default" Grails installation
-* This script was tested on Mac OS X (Snow Leopard), Linux (Ubuntu) and Windows (with cygwin)
+* cURL and unzip (If you want it to automatically pull missing versions)
+* This script was tested on Mac OS X (Lion), Linux (Ubuntu) and Windows (with cygwin)
 
 Installation
 ------------
@@ -22,9 +23,11 @@ Usage
 
 Using the script is as transparent as possible:
 
-* If you invoke it from a project folder, it will detect the version used by the project and call the correct grails (if it is installed in your system)
+* If you invoke it from a project folder, it will detect the version used by the project and call the correct grails
+	* If the required version does not exist locally, the script will attempt to download the version specified from grails amazon mirror
 * If you invoke it from any other folder that does not contain a Grails project, it will call the "default" Grails installation
-* If you want to call a specific Grails version (i.e. when doing an upgrade) you can specify the version you want in the first parameter. Ex:
+* If you want to call a specific Grails version (i.e. when doing an upgrade) you can specify the version you want in the first parameter. 
+	* If the version you specified does not exist locally, it will also attempt to download the version specified.
 
-        $ grails 1.3.3 upgrade
+	Ex: $ grails 1.3.3 upgrade
 

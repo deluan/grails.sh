@@ -1,5 +1,6 @@
 #!/bin/sh
-# Author: Deluan (http://github.com/deluan)
+# Original Author: Deluan (http://github.com/deluan)
+# Updated By: mattdelliott (http://github.com/mattdelliott)
 
 # Check if GRAILS_HOME is set
 if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]; then
@@ -20,7 +21,7 @@ APP_PROP="application.properties"
 
 # Try to get the version from the command line
 TRY_VERSION=$1
-if [ -d "${BASE_GRAILS_PATH}/grails-${TRY_VERSION}" ]; then
+if [[ $TRY_VERSION =~ [0-9]\.[0-9]\.[0-9] ]]; then
 	VERSION=$TRY_VERSION
 	shift
 fi 
@@ -34,6 +35,21 @@ fi
 	VERSION=$DEFAULT_VERSION
 
 export GRAILS_HOME=${BASE_GRAILS_PATH}/grails-${VERSION}
+
+# Attempt to download and unzip the specified version if it does not exist
+if [ ! -d ${GRAILS_HOME} ]; then
+        NEW_GRAILS_FILE=grails-${VERSION}
+        echo "grails ${VERSION} does not exist, attempting to download..."
+        curl "http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/${NEW_GRAILS_FILE}.zip" -o ${NEW_GRAILS_FILE}.zip
+        unzip ./${NEW_GRAILS_FILE}.zip -d ${BASE_GRAILS_PATH}/
+        rm -rf ${NEW_GRAILS_FILE}.zip
+        if [ -d ${GRAILS_HOME} ]; then
+            echo "Got grails version $VERSION successfully"
+        else
+            echo "Failed to get grails version $VERSION"
+        fi
+fi
+
 GRAILS_CMD=${GRAILS_HOME}/bin/grails
 
 if [ ! -x "$GRAILS_CMD" ]; then
