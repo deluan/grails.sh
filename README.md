@@ -5,7 +5,7 @@ Prerequisites
 
         /opt/grails-1.0.3
         /opt/grails-1.1.1
-        /opt/grails-1.3.2
+        /opt/grails-2.1.0.RC1
 
 * `GRAILS_HOME` environment variable must be set and point to your "default" Grails installation
 * cURL and unzip (If you want it to automatically pull missing versions)
@@ -29,5 +29,6 @@ Using the script is as transparent as possible:
 * If you want to call a specific Grails version (i.e. when doing an upgrade) you can specify the version you want in the first parameter. 
 	* If the version you specified does not exist locally, it will also attempt to download the version specified.
 
-	Ex: $ grails 1.3.3 upgrade
+	Ex: 
+        $ grails 2.0.1 upgrade
 

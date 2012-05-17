@@ -18,6 +18,7 @@ dirname()
 DEFAULT_VERSION=`basename $GRAILS_HOME | cut -f 2 -d "-"`
 BASE_GRAILS_PATH=`dirname $GRAILS_HOME`
 APP_PROP="application.properties"
+DOWNLOAD_BASE_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS"
 
 # Try to get the version from the command line
 TRY_VERSION=$1
@@ -40,9 +41,9 @@ export GRAILS_HOME=${BASE_GRAILS_PATH}/grails-${VERSION}
 if [ ! -d ${GRAILS_HOME} ]; then
         NEW_GRAILS_FILE=grails-${VERSION}
         echo "grails ${VERSION} does not exist, attempting to download..."
-        curl "http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/${NEW_GRAILS_FILE}.zip" -o ${NEW_GRAILS_FILE}.zip
+        curl "${DOWNLOAD_BASE_URL}/${NEW_GRAILS_FILE}.zip" -o ${NEW_GRAILS_FILE}.zip
         unzip ./${NEW_GRAILS_FILE}.zip -d ${BASE_GRAILS_PATH}/
-        rm -rf ${NEW_GRAILS_FILE}.zip
+        rm -r ${NEW_GRAILS_FILE}.zip
         if [ -d ${GRAILS_HOME} ]; then
             echo "Got grails version $VERSION successfully"
         else
