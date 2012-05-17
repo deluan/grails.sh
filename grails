@@ -7,6 +7,11 @@ if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]; then
 	exit 2
 fi
 
+dirname() 
+{
+	echo $1 | sed -e "s/[^\/\\]*$//" -e "s/^$/./"	
+}
+
 # Extract the default version and base path from GRAILS_HOME
 DEFAULT_VERSION=`basename $GRAILS_HOME | cut -f 2 -d "-"`
 BASE_GRAILS_PATH=`dirname $GRAILS_HOME`
