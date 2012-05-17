@@ -41,4 +41,4 @@ if [ ! -x "$GRAILS_CMD" ]; then
 	exit 3
 fi
 
-exec $GRAILS_CMD $*
+exec $GRAILS_CMD "$@"
