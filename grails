@@ -7,6 +7,7 @@ if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]; then
 	exit 2
 fi
 
+# From: https://github.com/alxndrsn/grails.sh/blob/master/dirname
 dirname() 
 {
 	echo $1 | sed -e "s/[^\/\\]*$//" -e "s/^$/./"	
