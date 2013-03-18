@@ -26,6 +26,13 @@ if [[ $TRY_VERSION =~ [0-9]\.[0-9]\.[0-9] ]]; then
 	shift
 fi 
 
+# use grailsw wrapper if no version is given and it exists.
+if [ -z "$VERSION" -a -f "./grailsw" ]; then
+	echo "Using grailsw"
+	exec ./grailsw "$@"
+	exit
+fi
+
 # Or else get the version from the application.properties in the current directory
 [ -z "$VERSION" -a -f "$APP_PROP" ] &&
     VERSION=`awk -F'=' '/app.grails.version/ { print $2 }' $APP_PROP | tr -d '\r\n'`
