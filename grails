@@ -1,9 +1,15 @@
 #!/bin/bash
 # Original Version: http://github.com/deluan
 
-# Check if GRAILS_HOME is set
-if [ -z "$GRAILS_HOME" -o ! -d "$GRAILS_HOME" ]; then
-	echo "Error: GRAILS_HOME not set"
+CMD=`basename $0`                              # grails-debug
+TOOL=`echo $CMD | cut -f 1 -d "-"`             # grails
+TOOL_UPPER=`echo $TOOL | tr '[a-z]' '[A-Z]'`   # GRAILS
+TOOL_HOME="\$${TOOL_UPPER}_HOME"               # $GRAILS_HOME 
+TOOL_HOME=`eval echo $TOOL_HOME`               # /opt/grails/grails-2.2.3
+
+# Check if TOOL_HOME is set
+if [ -z "TOOL_HOME" -o ! -d "$TOOL_HOME" ]; then
+	echo "Error: ${TOOL_UPPER}_HOME not set"
 	exit 2
 fi
 
@@ -13,11 +19,22 @@ dirname()
 	echo $1 | sed -e "s/[^\/\\]*$//" -e "s/^$/./"	
 }
 
-# Extract the default version and base path from GRAILS_HOME
-DEFAULT_VERSION=`basename $GRAILS_HOME | cut -f 2 -d "-"`
-BASE_GRAILS_PATH=`dirname $GRAILS_HOME`
+# Extract the default version and base path from TOOL_HOME
+DEFAULT_VERSION=`basename $TOOL_HOME | cut -f 2 -d "-"`
+BASE_TOOL_PATH=`dirname $TOOL_HOME`
 APP_PROP="application.properties"
-DOWNLOAD_BASE_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS"
+
+build_download_url()
+{
+	if [ $TOOL_UPPER == 'GRAILS' ]; then
+		DOWNLOAD_BASE_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS"
+		DOWNLOAD_SUFFIX=".zip"
+	else
+		DOWNLOAD_BASE_URL="http://dl.bintray.com/content/aalmiray/Griffon"
+		DOWNLOAD_SUFFIX="-bin.zip?direct"
+	fi
+	echo "${DOWNLOAD_BASE_URL}/${TOOL}-${VERSION}${DOWNLOAD_SUFFIX}"
+}
 
 # Try to get the version from the command line
 TRY_VERSION=$1
@@ -26,42 +43,44 @@ if [[ $TRY_VERSION =~ [0-9]\.[0-9]\.[0-9] ]]; then
 	shift
 fi 
 
-# use grailsw wrapper if no version is given and it exists.
-if [ -z "$VERSION" -a -f "./grailsw" ]; then
-	echo "Using grailsw"
-	exec ./grailsw "$@"
+# use wrapper if no version is given and it exists.
+#WRAPPER_CMD="${TOOL}w"
+if [ -z "$VERSION" -a -f "./$WRAPPER_CMD" ]; then
+	echo "Using $WRAPPER_CMD"
+	exec ./$WRAPPER_CMD "$@"
 	exit
 fi
 
 # Or else get the version from the application.properties in the current directory
 [ -z "$VERSION" -a -f "$APP_PROP" ] &&
-    VERSION=`awk -F'=' '/app.grails.version/ { print $2 }' $APP_PROP | tr -d '\r\n'`
+    VERSION=`awk -F'=' '/app.'${TOOL}'.version/ { print $2 }' $APP_PROP | tr -d '\r\n'`
 
 # Or else use the default version
 [ -z "$VERSION" ] &&
 	VERSION=$DEFAULT_VERSION
 
-export GRAILS_HOME=${BASE_GRAILS_PATH}/grails-${VERSION}
+export TOOL_HOME=${BASE_TOOL_PATH}${TOOL}-${VERSION}
 
 # Attempt to download and unzip the specified version if it does not exist
-if [ ! -d ${GRAILS_HOME} ]; then
-        NEW_GRAILS_FILE=grails-${VERSION}
-        echo "grails ${VERSION} does not exist, attempting to download..."
-        curl "${DOWNLOAD_BASE_URL}/${NEW_GRAILS_FILE}.zip" -o ${NEW_GRAILS_FILE}.zip
-        unzip ./${NEW_GRAILS_FILE}.zip -d ${BASE_GRAILS_PATH}/
-        rm -r ${NEW_GRAILS_FILE}.zip
-        if [ -d ${GRAILS_HOME} ]; then
-            echo "Got grails version $VERSION successfully"
+if [ ! -d ${TOOL_HOME} ]; then
+        NEW_FILE="${TOOL}-${VERSION}.zip"
+        echo "${TOOL_UPPER} ${VERSION} does not exist, attempting to download..."
+        curl `build_download_url` -o ${NEW_FILE}
+        unzip ./${NEW_FILE} -d ${BASE_TOOL_PATH}/
+        rm -r ${NEW_FILE}
+        if [ -d ${TOOL_HOME} ]; then
+            echo "Got ${TOOL} version $VERSION successfully"
         else
-            echo "Failed to get grails version $VERSION"
+            echo "Failed to get ${TOOL} version $VERSION"
         fi
 fi
 
-GRAILS_CMD=${GRAILS_HOME}/bin/grails
+TOOL_CMD=${TOOL_HOME}/bin/$CMD
 
-if [ ! -x "$GRAILS_CMD" ]; then
-	echo "Error: grails command not found at '$GRAILS_CMD'!"
+if [ ! -x "$TOOL_CMD" ]; then
+	echo "Error: $CMD command not found at '$TOOL_CMD'!"
 	exit 3
 fi
 
-exec $GRAILS_CMD "$@"
+declare "${TOOL_UPPER}_HOME"=$TOOL_HOME
+exec $TOOL_CMD "$@"
