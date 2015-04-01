@@ -24,24 +24,32 @@ DEFAULT_VERSION=`basename $TOOL_HOME | cut -f 2 -d "-"`
 BASE_TOOL_PATH=`dirname $TOOL_HOME`
 APP_PROP="application.properties"
 
-build_download_url()
-{
-	if [ $TOOL_UPPER == 'GRAILS' ]; then
-		DOWNLOAD_BASE_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS"
-		DOWNLOAD_SUFFIX=".zip"
-	else
-		DOWNLOAD_BASE_URL="http://dl.bintray.com/content/aalmiray/Griffon"
-		DOWNLOAD_SUFFIX="-bin.zip?direct"
-	fi
-	echo "${DOWNLOAD_BASE_URL}/${TOOL}-${VERSION}${DOWNLOAD_SUFFIX}"
-}
-
 # Try to get the version from the command line
 TRY_VERSION=$1
 if [[ $TRY_VERSION =~ [0-9]\.[0-9]\.[0-9] ]]; then
 	VERSION=$TRY_VERSION
 	shift
 fi 
+
+build_download_url()
+{
+	major_ver=`echo $VERSION | cut -d "." -f -1`
+	if [[ ${major_ver} -ge 3 ]]; then
+		DOWNLOAD_BASE_URL="https://github.com/grails/grails-core/releases/download"	
+                DOWNLOAD_SUFFIX=".zip"
+		echo "${DOWNLOAD_BASE_URL}/v${VERSION}/${TOOL}-${VERSION}${DOWNLOAD_SUFFIX}"
+		return
+	fi
+        if [ $TOOL_UPPER == 'GRAILS' ]; then
+                DOWNLOAD_BASE_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS"
+                DOWNLOAD_SUFFIX=".zip"
+        else
+                DOWNLOAD_BASE_URL="http://dl.bintray.com/content/aalmiray/Griffon"
+                DOWNLOAD_SUFFIX="-bin.zip?direct"
+        fi
+	
+        echo "${DOWNLOAD_BASE_URL}/${TOOL}-${VERSION}${DOWNLOAD_SUFFIX}"
+}
 
 # use wrapper if no version is given and it exists.
 #WRAPPER_CMD="${TOOL}w"
@@ -65,7 +73,7 @@ export TOOL_HOME=${BASE_TOOL_PATH}${TOOL}-${VERSION}
 if [ ! -d ${TOOL_HOME} ]; then
         NEW_FILE="${TOOL}-${VERSION}.zip"
         echo "${TOOL_UPPER} ${VERSION} does not exist, attempting to download..."
-        curl `build_download_url` -o ${NEW_FILE}
+        curl -L `build_download_url` -o ${NEW_FILE}
         unzip ./${NEW_FILE} -d ${BASE_TOOL_PATH}/
         rm -r ${NEW_FILE}
         if [ -d ${TOOL_HOME} ]; then
