@@ -23,6 +23,7 @@ dirname()
 DEFAULT_VERSION=`basename $TOOL_HOME | cut -f 2 -d "-"`
 BASE_TOOL_PATH=`dirname $TOOL_HOME`
 APP_PROP="application.properties"
+APP_PROP3="gradle.properties"
 
 # Try to get the version from the command line
 TRY_VERSION=$1
@@ -62,6 +63,11 @@ fi
 # Or else get the version from the application.properties in the current directory
 [ -z "$VERSION" -a -f "$APP_PROP" ] &&
     VERSION=`awk -F'=' '/app.'${TOOL}'.version/ { print $2 }' $APP_PROP | tr -d '\r\n'`
+
+
+# Grails >= 3.0.0
+[ -z "$VERSION" -a -f "$APP_PROP3" ] &&
+    VERSION=`awk -F'=' '/grailsVersion/ { print $2 }' $APP_PROP3 | tr -d '\r\n'`
 
 # Or else use the default version
 [ -z "$VERSION" ] &&
