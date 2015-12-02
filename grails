@@ -4,7 +4,7 @@
 CMD=`basename $0`                              # grails-debug
 TOOL=`echo $CMD | cut -f 1 -d "-"`             # grails
 TOOL_UPPER=`echo $TOOL | tr '[a-z]' '[A-Z]'`   # GRAILS
-TOOL_HOME="\$${TOOL_UPPER}_HOME"               # $GRAILS_HOME 
+TOOL_HOME="\$${TOOL_UPPER}_HOME"               # $GRAILS_HOME
 TOOL_HOME=`eval echo $TOOL_HOME`               # /opt/grails/grails-2.2.3
 
 # Check if TOOL_HOME is set
@@ -14,20 +14,33 @@ if [ -z "TOOL_HOME" -o ! -d "$TOOL_HOME" ]; then
 fi
 
 # From: https://github.com/alxndrsn/grails.sh/blob/master/dirname
-dirname() 
+dirname()
 {
-	echo $1 | sed -e "s/[^\/\\]*$//" -e "s/^$/./"	
+	echo $1 | sed -e "s/[^\/\\]*$//" -e "s/^$/./"
 }
 
 # Extract the default version and base path from TOOL_HOME
 DEFAULT_VERSION=`basename $TOOL_HOME | cut -f 2 -d "-"`
 BASE_TOOL_PATH=`dirname $TOOL_HOME`
 APP_PROP="application.properties"
+APP_PROP3="gradle.properties"
+
+read_app_version()
+{
+	if [ -z "$VERSION" -a -f "$APP_PROP" ]; then
+    awk -F'=' '/app.'${TOOL}'.version/ { print $2 }' $APP_PROP | tr -d '\r\n'
+		exit
+	fi
+
+	# Grails >= 3.0.0
+	[ -z "$VERSION" -a -f "$APP_PROP3" ] &&
+    	awk -F'=' '/grailsVersion/ { print $2 }' $APP_PROP3 | tr -d '\r\n'
+}
 
 build_download_url()
 {
 	if [ $TOOL_UPPER == 'GRAILS' ]; then
-		DOWNLOAD_BASE_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS"
+		DOWNLOAD_BASE_URL="https://github.com/grails/grails-core/releases/download/v${VERSION}"
 		DOWNLOAD_SUFFIX=".zip"
 	else
 		DOWNLOAD_BASE_URL="http://dl.bintray.com/content/aalmiray/Griffon"
@@ -41,7 +54,7 @@ TRY_VERSION=$1
 if [[ $TRY_VERSION =~ [0-9]\.[0-9]\.[0-9] ]]; then
 	VERSION=$TRY_VERSION
 	shift
-fi 
+fi
 
 # use wrapper if no version is given and it exists.
 #WRAPPER_CMD="${TOOL}w"
@@ -51,9 +64,10 @@ if [ -z "$VERSION" -a -f "./$WRAPPER_CMD" ]; then
 	exit
 fi
 
-# Or else get the version from the application.properties in the current directory
-[ -z "$VERSION" -a -f "$APP_PROP" ] &&
-    VERSION=`awk -F'=' '/app.'${TOOL}'.version/ { print $2 }' $APP_PROP | tr -d '\r\n'`
+# Or else get the version from the application.properties/gradle.properties
+# in the current directory
+[ -z "$VERSION" ] &&
+	VERSION=`read_app_version`
 
 # Or else use the default version
 [ -z "$VERSION" ] &&
@@ -65,7 +79,8 @@ export TOOL_HOME=${BASE_TOOL_PATH}${TOOL}-${VERSION}
 if [ ! -d ${TOOL_HOME} ]; then
         NEW_FILE="${TOOL}-${VERSION}.zip"
         echo "${TOOL_UPPER} ${VERSION} does not exist, attempting to download..."
-        curl `build_download_url` -o ${NEW_FILE}
+				echo "Downloading from: `build_download_url`"
+        curl -L `build_download_url` -o ${NEW_FILE}
         unzip ./${NEW_FILE} -d ${BASE_TOOL_PATH}/
         rm -r ${NEW_FILE}
         if [ -d ${TOOL_HOME} ]; then
@@ -83,4 +98,10 @@ if [ ! -x "$TOOL_CMD" ]; then
 fi
 
 declare "${TOOL_UPPER}_HOME"=$TOOL_HOME
+
+if [ "$1" = "install-version" ]; then
+	echo "Version $VERSION installed at ${TOOL_HOME}"
+	exit
+fi
+
 exec $TOOL_CMD "$@"
