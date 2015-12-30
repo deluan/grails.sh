@@ -7,9 +7,16 @@ TOOL_UPPER=`echo $TOOL | tr '[a-z]' '[A-Z]'`   # GRAILS
 TOOL_HOME="\$${TOOL_UPPER}_HOME"               # $GRAILS_HOME
 TOOL_HOME=`eval echo $TOOL_HOME`               # /opt/grails/grails-2.2.3
 
+if [ -z $TOOL_HOME ]; then
+  TOOL_HOME="\$${TOOL_UPPER}_DEFAULT_HOME"     # GRAILS_DEFAULT_HOME
+  TOOL_HOME=`eval echo $TOOL_HOME`
+	# DO NOT SET GRAILS_HOME env. var if you use more than one Grails version,
+  # as this can lead to problems.
+fi
+
 # Check if TOOL_HOME is set
 if [ -z "TOOL_HOME" -o ! -d "$TOOL_HOME" ]; then
-	echo "Error: ${TOOL_UPPER}_HOME not set"
+	echo "Error: ${TOOL_UPPER}_DEFAULT_HOME or ${TOOL_UPPER}_HOME not set"
 	exit 2
 fi
 
